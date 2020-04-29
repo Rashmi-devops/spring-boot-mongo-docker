@@ -1,0 +1,35 @@
+pipeline {
+   agent {
+       label 'slave'
+   }   
+    environment {
+       mavenHOME = '/usr/share/maven/bin:$PATH'
+   }
+
+   stages {
+      stage("SCM CHECKOUT") {
+         steps {
+            git credentialsId: 'Git-Creds', url: 'https://github.com/Rashmi-devops/spring-boot-mongo-docker.git'
+         }
+      }
+   
+      stage("Maven Build") {
+         steps {
+            sh "mvn clean package"
+           } 
+        }
+      stage("Build Docker Image"){
+         steps{
+             sh "docker build -t binayakredhat/spring-mongo ."
+      }
+   }
+      stage("Login to docker hub and push image"){
+         steps {
+            withCredentials([string(credentialsId: 'docker-creds', variable: 'DOCKER_PASS')]) {
+             sh "docker login -u binayakredhat -p ${DOCKER_PASS}"
+             sh "docker push binayakredhat/spring-mongo"
+            } 
+         } 
+      }
+ } 
+}
