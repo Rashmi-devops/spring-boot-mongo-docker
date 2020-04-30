@@ -30,6 +30,12 @@ pipeline {
              sh "docker push binayakredhat/spring-mongo"
             } 
          } 
+         
       }
+      stage('Deploying Application in K*S cluster'){
+          steps {
+              sh "kubectl create -f springBootMongo.yml"
+          } 
+       }   
  } 
 }
